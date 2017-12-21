@@ -1,13 +1,6 @@
 package db;
 
-import org.postgresql.PGConnection;
-import org.postgresql.copy.CopyIn;
-import org.postgresql.copy.CopyManager;
-
-import java.security.InvalidParameterException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * Class to establish a connection to the database and interact with it.
@@ -15,6 +8,16 @@ import java.sql.SQLException;
 public class BenchmarkDB implements AutoCloseable {
 
     private Connection conn;
+
+    private static final String GET_BALANCE_SQL = "SELECT balance FROM accounts WHERE branchId = ?";
+    private PreparedStatement getBalanceStmt;
+
+    private static final String DEPOSIT_SQL = "";
+    private PreparedStatement depositStmt;
+
+    private static final String ANALYSE_SQL = "";
+    private PreparedStatement analyseStmt;
+
 
     /**
      * Initializes a connection to the database
@@ -26,10 +29,19 @@ public class BenchmarkDB implements AutoCloseable {
      */
     public BenchmarkDB(String ip, String user, String password) throws SQLException {
         conn = DriverManager.getConnection("jdbc:postgresql://" + ip + "/ntps", user, password);
+
+        getBalanceStmt = conn.prepareStatement(GET_BALANCE_SQL);
+        depositStmt = conn.prepareStatement(DEPOSIT_SQL);
+        analyseStmt = conn.prepareStatement(ANALYSE_SQL);
     }
 
-    public double getBalance(int accId) {
-        return 0;
+    public double getBalance(int accId) throws SQLException {
+        getBalanceStmt.clearParameters();
+        getBalanceStmt.setInt(1, accId);
+
+        ResultSet rs = getBalanceStmt.executeQuery();
+        rs.next();
+        return rs.getInt(1);
     }
 
     public void deposit(int accId, int tellerId, int branchId, double delta) {
