@@ -44,8 +44,23 @@ public class BenchmarkDB implements AutoCloseable {
         return rs.getInt(1);
     }
 
-    public void deposit(int accId, int tellerId, int branchId, double delta) {
+    public double deposit(int accId, int tellerId, int branchId, double delta) {
+        PreparedStatement updateBranches = null;
 
+        String updateBranchesString =
+                "BEGIN" +
+                    "UPDATE Branches" +
+                    "SET Balance = Balance + ?" +
+                    "WHERE branchId = ?" +
+                    "UPDATE Tellers" +
+                    "SET Balance = Balance + ?" +
+                    "WHERE tellerId = ?" +
+                    "UPDATE Accounts" +
+                    "SET Balance = Balance + ?" +
+                    "WHERE accId = ?" +
+                "END";
+
+        return 0;
     }
 
     public int analyse(double delta) {
