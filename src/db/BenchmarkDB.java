@@ -12,7 +12,24 @@ public class BenchmarkDB implements AutoCloseable {
     private static final String GET_BALANCE_SQL = "SELECT balance FROM accounts WHERE branchId = ?";
     private PreparedStatement getBalanceStmt;
 
-    private static final String DEPOSIT_SQL = "";
+    private static final String DEPOSIT_SQL =
+                "BEGIN" +
+                    "UPDATE branches" +
+                    "SET balance = balance + (?)" +
+                    "WHERE branchid = ?" +
+
+                    "UPDATE tellers" +
+                    "SET balance = balance + (?)" +
+                    "WHERE tellerid = ?" +
+
+                    "UPDATE accounts" +
+                    "SET balance = balance + (?)" +
+                    "WHERE accid = ?" +
+
+                    "INSERT INTO history" +
+                    "(accid, tellerid, delta, branchid, accbalance)" +
+                    "VALUES(?, ?, ?, ?, ?)" +
+                "END";
     private PreparedStatement depositStmt;
 
     private static final String ANALYSE_SQL = "";
@@ -44,23 +61,21 @@ public class BenchmarkDB implements AutoCloseable {
         return rs.getInt(1);
     }
 
-    public double deposit(int accId, int tellerId, int branchId, double delta) {
-        PreparedStatement updateBranches = null;
+    public void deposit(int accId, int tellerId, int branchId, double delta) throws SQLException {
+        depositStmt.clearParameters();
 
-        String updateBranchesString =
-                "BEGIN" +
-                    "UPDATE Branches" +
-                    "SET Balance = Balance + ?" +
-                    "WHERE branchId = ?" +
-                    "UPDATE Tellers" +
-                    "SET Balance = Balance + ?" +
-                    "WHERE tellerId = ?" +
-                    "UPDATE Accounts" +
-                    "SET Balance = Balance + ?" +
-                    "WHERE accId = ?" +
-                "END";
+        depositStmt.setDouble(1, delta);
+        depositStmt.setInt(2, branchId);
+        depositStmt.setDouble(3, delta);
+        depositStmt.setInt(4, tellerId);
+        depositStmt.setDouble(5, delta);
+        depositStmt.setInt(6, accId);
+        depositStmt.setInt(7, accId);
+        depositStmt.setInt(8, tellerId);
+        depositStmt.setDouble(9, delta);
+        depositStmt.setInt(10, branchId);
 
-        return 0;
+        depositStmt.execute();
     }
 
     public int analyse(double delta) {
