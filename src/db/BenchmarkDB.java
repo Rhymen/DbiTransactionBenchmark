@@ -15,7 +15,7 @@ public class BenchmarkDB implements AutoCloseable {
     private static final String DEPOSIT_SQL = "";
     private PreparedStatement depositStmt;
 
-    private static final String ANALYSE_SQL = "";
+    private static final String ANALYSE_SQL = "SELECT COUNT(*) FROM history WHERE delta = ?";
     private PreparedStatement analyseStmt;
 
 
@@ -49,22 +49,34 @@ public class BenchmarkDB implements AutoCloseable {
 
         String updateBranchesString =
                 "BEGIN" +
-                    "UPDATE Branches" +
-                    "SET Balance = Balance + ?" +
-                    "WHERE branchId = ?" +
-                    "UPDATE Tellers" +
-                    "SET Balance = Balance + ?" +
-                    "WHERE tellerId = ?" +
-                    "UPDATE Accounts" +
-                    "SET Balance = Balance + ?" +
-                    "WHERE accId = ?" +
-                "END";
+                        "UPDATE Branches" +
+                        "SET Balance = Balance + ?" +
+                        "WHERE branchId = ?" +
+                        "UPDATE Tellers" +
+                        "SET Balance = Balance + ?" +
+                        "WHERE tellerId = ?" +
+                        "UPDATE Accounts" +
+                        "SET Balance = Balance + ?" +
+                        "WHERE accId = ?" +
+                        "END";
 
         return 0;
     }
 
-    public int analyse(double delta) {
-        return 0;
+    /**
+     * Returns the number of deposits made with a given delta.
+     *
+     * @param delta The exact amount of the deposit
+     * @return The number of found deposits
+     * @throws SQLException Database error occurred
+     */
+    public int analyse(double delta) throws SQLException {
+        analyseStmt.clearParameters();
+        analyseStmt.setDouble(1, delta);
+
+        ResultSet rs = analyseStmt.executeQuery();
+        rs.next();
+        return rs.getInt(1);
     }
 
     /**
