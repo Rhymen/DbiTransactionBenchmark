@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="DbiTransaktionBenchmark:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/DbiTransaktionBenchmark_jar</output-path>
+    <root id="root">
+      <element id="archive" name="DbiTransaktionBenchmark.jar">
+        <element id="module-output" name="DbiTransaktionBenchmark" />
+      </element>
+      <element id="library" level="project" name="org.postgresql:postgresql:42.1.4" />
+    </root>
+  </artifact>
+</component>
