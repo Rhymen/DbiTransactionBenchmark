@@ -13,26 +13,26 @@ public class BenchmarkDB implements AutoCloseable {
     private PreparedStatement getBalanceStmt;
 
     private static final String DEPOSIT_SQL =
-                "BEGIN" +
-                    "UPDATE branches" +
-                    "SET balance = balance + (?)" +
-                    "WHERE branchid = ?" +
+            "BEGIN;" +
+                    "UPDATE branches " +
+                    "SET balance = balance + (?) " +
+                    "WHERE branchid = ?;" +
 
-                    "UPDATE tellers" +
+                    "UPDATE tellers " +
                     "SET balance = balance + (?)" +
-                    "WHERE tellerid = ?" +
+                    "WHERE tellerid = ?;" +
 
-                    "UPDATE accounts" +
+                    "UPDATE accounts " +
                     "SET balance = balance + (?)" +
-                    "WHERE accid = ?" +
+                    "WHERE accid = ?;" +
 
                     "INSERT INTO history" +
-                    "(accid, tellerid, delta, branchid, accbalance)" +
-                    "VALUES(?, ?, ?, ?, ?)" +
-                "END";
+                    "(accid, tellerid, DELTA, branchid, accbalance)" +
+                    "VALUES(?, ?, ?, ?, ?);" +
+                    "END;";
     private PreparedStatement depositStmt;
 
-    private static final String ANALYSE_SQL = "SELECT COUNT(*) FROM history WHERE delta = ?";
+    private static final String ANALYSE_SQL = "SELECT COUNT(1) FROM history WHERE delta = ?";
     private PreparedStatement analyseStmt;
 
 
