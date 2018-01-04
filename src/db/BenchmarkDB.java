@@ -9,30 +9,30 @@ public class BenchmarkDB implements AutoCloseable {
 
     private Connection conn;
 
-    private static final String GET_BALANCE_SQL = "SELECT balance FROM accounts WHERE branchId = ?";
+    private static final String GET_BALANCE_SQL = "SELECT balance FROM accounts WHERE accid = ?";
     private PreparedStatement getBalanceStmt;
 
     private static final String DEPOSIT_SQL =
-                "BEGIN" +
-                    "UPDATE branches" +
-                    "SET balance = balance + (?)" +
-                    "WHERE branchid = ?" +
+                "BEGIN; " +
+                    "UPDATE branches " +
+                    "SET balance = balance + ? " +
+                    "WHERE branchid = ?; " +
 
-                    "UPDATE tellers" +
-                    "SET balance = balance + (?)" +
-                    "WHERE tellerid = ?" +
+                    "UPDATE tellers " +
+                    "SET balance = balance + ? " +
+                    "WHERE tellerid = ?; " +
 
-                    "UPDATE accounts" +
-                    "SET balance = balance + (?)" +
-                    "WHERE accid = ?" +
+                    "UPDATE accounts " +
+                    "SET balance = balance + ? " +
+                    "WHERE accid = ?; " +
 
-                    "INSERT INTO history" +
-                    "(accid, tellerid, delta, branchid, accbalance)" +
-                    "VALUES(?, ?, ?, ?, ?)" +
-                "END";
+                    "INSERT INTO history " +
+                    "(accid, tellerid, delta, branchid, accbalance, cmmnt) " +
+                    "SELECT ?, ?, ?, ?, balance, ? FROM accounts WHERE accid = ?;" +
+                "COMMIT;";
     private PreparedStatement depositStmt;
 
-    private static final String ANALYSE_SQL = "";
+    private static final String ANALYSE_SQL = "SELECT COUNT(1) AS count FROM history WHERE delta = ?;";
     private PreparedStatement analyseStmt;
 
 
@@ -54,6 +54,7 @@ public class BenchmarkDB implements AutoCloseable {
 
     public double getBalance(int accId) throws SQLException {
         getBalanceStmt.clearParameters();
+
         getBalanceStmt.setInt(1, accId);
 
         ResultSet rs = getBalanceStmt.executeQuery();
@@ -74,12 +75,20 @@ public class BenchmarkDB implements AutoCloseable {
         depositStmt.setInt(8, tellerId);
         depositStmt.setDouble(9, delta);
         depositStmt.setInt(10, branchId);
+        depositStmt.setString(11, "");
+        depositStmt.setInt(12, accId);
 
         depositStmt.execute();
     }
 
-    public int analyse(double delta) {
-        return 0;
+    public int analyse(double delta) throws SQLException {
+        analyseStmt.clearParameters();
+
+        analyseStmt.setDouble(1, delta);
+        ResultSet rs = analyseStmt.executeQuery();
+        rs.next();
+        return rs.getInt(1);
+
     }
 
     /**
