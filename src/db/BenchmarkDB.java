@@ -9,30 +9,13 @@ public class BenchmarkDB implements AutoCloseable {
 
     private Connection conn;
 
-    private static final String GET_BALANCE_SQL = "SELECT balance FROM accounts WHERE accid = ?";
+    private static final String GET_BALANCE_SQL = "SELECT fGetBalance(?);";
     private PreparedStatement getBalanceStmt;
 
-    private static final String DEPOSIT_SQL =
-                "BEGIN; " +
-                    "UPDATE branches " +
-                    "SET balance = balance + ? " +
-                    "WHERE branchid = ?; " +
-
-                    "UPDATE tellers " +
-                    "SET balance = balance + ? " +
-                    "WHERE tellerid = ?; " +
-
-                    "UPDATE accounts " +
-                    "SET balance = balance + ? " +
-                    "WHERE accid = ?; " +
-
-                    "INSERT INTO history " +
-                    "(accid, tellerid, delta, branchid, accbalance, cmmnt) " +
-                    "SELECT ?, ?, ?, ?, balance, ? FROM accounts WHERE accid = ?;" +
-                "COMMIT;";
+    private static final String DEPOSIT_SQL = "SELECT fDeposit(?,?,?,?);";
     private PreparedStatement depositStmt;
 
-    private static final String ANALYSE_SQL = "SELECT COUNT(1) AS count FROM history WHERE delta = ?;";
+    private static final String ANALYSE_SQL = "SELECT fAnalyse(?);";
     private PreparedStatement analyseStmt;
 
 
@@ -62,29 +45,21 @@ public class BenchmarkDB implements AutoCloseable {
         return rs.getInt(1);
     }
 
-    public void deposit(int accId, int tellerId, int branchId, double delta) throws SQLException {
+    public void deposit(int accId, int tellerId, int branchId, int delta) throws SQLException {
         depositStmt.clearParameters();
 
-        depositStmt.setDouble(1, delta);
-        depositStmt.setInt(2, branchId);
-        depositStmt.setDouble(3, delta);
-        depositStmt.setInt(4, tellerId);
-        depositStmt.setDouble(5, delta);
-        depositStmt.setInt(6, accId);
-        depositStmt.setInt(7, accId);
-        depositStmt.setInt(8, tellerId);
-        depositStmt.setDouble(9, delta);
-        depositStmt.setInt(10, branchId);
-        depositStmt.setString(11, "");
-        depositStmt.setInt(12, accId);
+        depositStmt.setInt(1, accId);
+        depositStmt.setInt(2, tellerId);
+        depositStmt.setInt(3, branchId);
+        depositStmt.setInt(4, delta);
 
         depositStmt.execute();
     }
 
-    public int analyse(double delta) throws SQLException {
+    public int analyse(int delta) throws SQLException {
         analyseStmt.clearParameters();
 
-        analyseStmt.setDouble(1, delta);
+        analyseStmt.setInt(1, delta);
         ResultSet rs = analyseStmt.executeQuery();
         rs.next();
         return rs.getInt(1);

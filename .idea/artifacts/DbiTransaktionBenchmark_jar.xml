@@ -5,7 +5,7 @@
       <element id="archive" name="DbiTransaktionBenchmark.jar">
         <element id="module-output" name="DbiTransaktionBenchmark" />
       </element>
-      <element id="library" level="project" name="org.postgresql:postgresql:42.1.4" />
+      <element id="library" level="project" name="postgresql-42.1.4" />
     </root>
   </artifact>
 </component>
