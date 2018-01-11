@@ -1,5 +1,4 @@
 import db.BenchmarkDB;
-import utils.ParameterGenerator;
 
 import java.sql.SQLException;
 
@@ -17,9 +16,9 @@ public class Main {
 
         System.out.println("[] starting " + threadCount + " threads");
 
-        LoadDriver[] threads = new LoadDriver[threadCount];
+        TestSuite[] threads = new TestSuite[threadCount];
         for (int i = 0; i < threadCount; i++) {
-            threads[i] = new LoadDriver();
+            threads[i] = new TestSuite(i);
             threads[i].start();
             System.out.println("[] started " + (i + 1) + ". thread");
         }

@@ -1,36 +1,51 @@
 import db.BenchmarkDB;
 import utils.ParameterGenerator;
 
-public class LoadDriver extends Thread {
+public class TestSuite extends Thread {
 
     private int count = 0;
+    private int threadId;
 
     public int getCount() {
         return count;
     }
 
+    TestSuite(int threadId) {
+        super();
+        this.threadId = threadId;
+    }
+
     @Override
     public void run() {
         try (BenchmarkDB db = new BenchmarkDB("192.168.122.36",  "postgres", "dbidbi")) {
-            long duration = System.currentTimeMillis();
-            long now;
-            int f;
+            long start = System.currentTimeMillis();
+            long duration;
+
+            int p;
             while (true) {
-                f = ParameterGenerator.getInt(0, 100);
-                if (f <= 35) {
+                p = ParameterGenerator.getInt(0, 100);
+                if (p <= 35) {
                     db.getBalance(ParameterGenerator.getInt(1, 10000000));
-                } else if (f <= 85) {
+                } else if (p <= 85) {
                     db.deposit(ParameterGenerator.getInt(1, 10000000), ParameterGenerator.getInt(1, 1000), ParameterGenerator.getInt(1, 100), ParameterGenerator.getInt(1, 10000));
                 } else {
                     db.analyse(ParameterGenerator.getInt(1, 10000));
                 }
 
-                now = System.currentTimeMillis() - duration;
+                duration = System.currentTimeMillis() - start;
 
-                if (now > 240000 && now < 540000) {
+                // start to count between 4 and 9 minutes
+                if (duration > 240000 && duration < 540000) {
                     count++;
+
+                    //log once per minute
+                    if (duration % 60000 == 0) {
+                        System.out.println("[] thread " + (threadId + 1) + " count: " + count);
+                    }
                 }
-                if (now > 600000) {
+
+                //end test after 10 minutes
+                if (duration > 600000) {
                     return;
                 }
 

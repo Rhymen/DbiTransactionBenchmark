@@ -22,8 +22,8 @@ public class BenchmarkDB implements AutoCloseable {
     /**
      * Initializes a connection to the database
      *
-     * @param ip       The database ip (localhost / 192.168.122.36)
-     * @param user     Database username
+     * @param ip The database ip (localhost / 192.168.122.36)
+     * @param user Database username
      * @param password Database password
      * @throws SQLException Database error occurred
      */
@@ -35,7 +35,14 @@ public class BenchmarkDB implements AutoCloseable {
         analyseStmt = conn.prepareStatement(ANALYSE_SQL);
     }
 
-    public double getBalance(int accId) throws SQLException {
+    /**
+     * Returns the balance of the account with the passed id.
+     *
+     * @param accId Account id
+     * @return Balance of the account
+     * @throws SQLException Database error occurred
+     */
+    public int getBalance(int accId) throws SQLException {
         getBalanceStmt.clearParameters();
 
         getBalanceStmt.setInt(1, accId);
@@ -45,7 +52,17 @@ public class BenchmarkDB implements AutoCloseable {
         return rs.getInt(1);
     }
 
-    public void deposit(int accId, int tellerId, int branchId, int delta) throws SQLException {
+    /**
+     * Deposits money in an account and updates the teller and branch.
+     *
+     * @param accId Account id
+     * @param tellerId Teller id
+     * @param branchId Branch id
+     * @param delta The delta of money
+     * @return True if the query was successful, false otherwise
+     * @throws SQLException Database error occurred
+     */
+    public boolean deposit(int accId, int tellerId, int branchId, int delta) throws SQLException {
         depositStmt.clearParameters();
 
         depositStmt.setInt(1, accId);
@@ -53,13 +70,21 @@ public class BenchmarkDB implements AutoCloseable {
         depositStmt.setInt(3, branchId);
         depositStmt.setInt(4, delta);
 
-        depositStmt.execute();
+        return depositStmt.execute();
     }
 
+    /**
+     * Returns the amount of deposits with the passed delta.
+     *
+     * @param delta The delta of money
+     * @return The amount of deposits with the passed delta
+     * @throws SQLException Database error occurred
+     */
     public int analyse(int delta) throws SQLException {
         analyseStmt.clearParameters();
 
         analyseStmt.setInt(1, delta);
+
         ResultSet rs = analyseStmt.executeQuery();
         rs.next();
         return rs.getInt(1);

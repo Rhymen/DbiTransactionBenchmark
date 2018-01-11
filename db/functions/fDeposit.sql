@@ -4,12 +4,15 @@ BEGIN
   UPDATE branches
   SET balance = balance + pDelta
   WHERE branchid = pBranchId;
+
   UPDATE tellers
   SET balance = balance + pDelta
   WHERE tellerid = pTellerId;
+
   UPDATE accounts
   SET balance = balance + pDelta
   WHERE accid = pAccId;
+
   INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt)
     SELECT
       pAccId,
