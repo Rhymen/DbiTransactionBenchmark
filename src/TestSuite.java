@@ -37,11 +37,6 @@ public class TestSuite extends Thread {
                 // start to count between 4 and 9 minutes
                 if (duration > 240000 && duration < 540000) {
                     count++;
-
-                    //log once per minute
-                    if (duration % 60000 == 0) {
-                        System.out.println("[] thread " + (threadId + 1) + " count: " + count);
-                    }
                 }
 
                 //end test after 10 minutes
