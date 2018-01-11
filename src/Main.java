@@ -30,7 +30,7 @@ public class Main {
                 System.out.println("[] thread " + (i + 1) + " count: " + threads[i].getCount());
                 count += threads[i].getCount();
             }
-            System.out.println("[] threads: " + threadCount + " overall: " + count + " avg: " + count / threadCount);
+            System.out.println("[] threads: " + threadCount + " overall: " + count + " overall/s: " + count / 300);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
