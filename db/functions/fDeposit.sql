@@ -1,5 +1,7 @@
 CREATE OR REPLACE FUNCTION fDeposit(pAccId INTEGER, pTellerId INTEGER, pBranchId INTEGER, pDelta INTEGER)
-  RETURNS VOID AS $$
+  RETURNS INTEGER AS $$
+DECLARE
+  newBalance INTEGER;
 BEGIN
   UPDATE branches
   SET balance = balance + pDelta
@@ -11,18 +13,13 @@ BEGIN
 
   UPDATE accounts
   SET balance = balance + pDelta
-  WHERE accid = pAccId;
+  WHERE accid = pAccId
+  RETURNING balance
+    INTO newBalance;
 
   INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt)
-    SELECT
-      pAccId,
-      pTellerId,
-      pDelta,
-      pBranchId,
-      balance,
-      ''
-    FROM accounts
-    WHERE accid = pAccId;
+  VALUES (pAccId, pTellerId, pDelta, pBranchId, newBalance, '');
 
+  RETURN newBalance;
 END;
 $$ LANGUAGE plpgsql;

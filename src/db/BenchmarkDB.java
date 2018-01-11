@@ -59,10 +59,10 @@ public class BenchmarkDB implements AutoCloseable {
      * @param tellerId Teller id
      * @param branchId Branch id
      * @param delta The delta of money
-     * @return True if the query was successful, false otherwise
+     * @return The new account balance
      * @throws SQLException Database error occurred
      */
-    public boolean deposit(int accId, int tellerId, int branchId, int delta) throws SQLException {
+    public int deposit(int accId, int tellerId, int branchId, int delta) throws SQLException {
         depositStmt.clearParameters();
 
         depositStmt.setInt(1, accId);
@@ -70,7 +70,9 @@ public class BenchmarkDB implements AutoCloseable {
         depositStmt.setInt(3, branchId);
         depositStmt.setInt(4, delta);
 
-        return depositStmt.execute();
+        ResultSet rs = analyseStmt.executeQuery();
+        rs.next();
+        return rs.getInt(1);
     }
 
     /**
