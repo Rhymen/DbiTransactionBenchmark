@@ -70,7 +70,7 @@ public class BenchmarkDB implements AutoCloseable {
         depositStmt.setInt(3, branchId);
         depositStmt.setInt(4, delta);
 
-        ResultSet rs = analyseStmt.executeQuery();
+        ResultSet rs = depositStmt.executeQuery();
         rs.next();
         return rs.getInt(1);
     }
